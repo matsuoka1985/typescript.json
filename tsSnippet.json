@@ -1,0 +1,432 @@
+{
+  "enum": {
+    "prefix": "enum",
+    "body": "enum CoffeeSize{\n\tSHORT=\"SHORT\",\n\tTALL=\"TALL\",\n\tGRANDE=\"GRANDE\",\n\tVENTI=\"VENTI\",\n}"
+  },
+  "enum2": {
+    "prefix": "enum",
+    "body": "enum CoffeeSize{\n\tSHORT,\n\tTALL,\n\tGRANDE,\n\tVENTI,\n}"
+  },
+  "typeGuard": {
+    "prefix": "typeGuard",
+    "body": "let unknownInput: unknown;\nlet text: string;\n\nif (typeof unknownInput === 'string') {\n\ttext = unknownInput;\n}\n"
+  },
+  "setterAndGetter": {
+    "prefix": "get",
+    "body": "get propertyName(){\n\tif(!this._propertyName){\n\t\tthrow new Error(\"There is no propertyName.\");\n\t}\n\treturn this._propertyName;\n}\nset propertyName(value){\n\tif(!this._propertyName){\n\t\tthrow new Error(\"There is no propertyName.\");\n\t}\n\tthis._propertyName=value;\n}"
+  },
+  "abstract class": {
+    "prefix": "abstract class",
+    "body": "//abstractクラスは継承されるためだけに存在するクラス。\nabstract class Person {\n\t//abstractクラスは勿論インスタンスを生成できない。abstractクラスのstaticメソッドやstaticプロパティにはアクセスできる。\n\tstatic species = 'Homo Sapience';\n\tstatic isAdult(age: number) {\n\t\tif (age > 17) {\n\t\t\treturn true;\n\t\t}\n\t\treturn false;\n\t}\n\tconstructor(public name: string, protected age: number) {}\n\tincrementAge() {\n\t\tconsole.log(Person.species);\n\t\tthis.age += 1;\n\t}\n\tgreeting(this: Person) {\n\t\tconsole.log(`Hello! My name is ${this.name} I am ${this.age} years old.`);\n\t\tthis.explainJob();\n\t}\n\t//abstractはプロパティにもメソッドにもつけることができる。その際はclass自体をabstractにしないといけない。\n\t//abstractクラスにabstractメソッドを作る時、暗黙的なanyにならないようにきちんとその戻り値の型を設定してあげないといけない。\n\t//abstractクラスに作ったabstractプロパティやabstractメソッドは必ずそのabstractクラスの継承先のクラスに存在しなければいけない。\n\t//abstractクラスがインスタンスを生成できないのは、abstractメソッドやabstractプロパティの実体がきちんと定義されてないから\n\t//そこにアクセスしようとするとエラーが出るだろうことからもわかる。\n\tabstract explainJob(): void;\n}\nclass Teacher extends Person {\n\t//abstractクラスに作ったabstractプロパティやabstractメソッドは必ずそのabstractクラスの継承先のクラスに存在しなければいけない。\n\texplainJob() {\n\t\tconsole.log(`I am a teacher and I teach ${this.subject}.`);\n\t}\n\tget subject() {\n\t\tif (!this._subject) {\n\t\t\tthrow new Error('no subject.');\n\t\t}\n\t\treturn this._subject;\n\t}\n\tset subject(value) {\n\t\tif (!this._subject) {\n\t\t\tthrow new Error('no subject.');\n\t\t}\n\t\tthis._subject = value;\n\t}\n\tconstructor(name: string, age: number, private _subject: string) {\n\t\tsuper(name, age);\n\t}\n\tgreeting(this: Teacher) {\n\t\tconsole.log(\n\t\t\t`Hello! My name is ${this.name}. I am  ${this.age} years old . I teach ${this.subject}.`\n\t\t);\n\t}\n}\nconst teacher=new Teacher(\"Quill\",38,\"Math\");\nteacher.greeting();"
+  },
+  "singleton pattern": {
+    "prefix": "singleton pattern",
+    "body": "class Teacher{\n\t//privateプロパティにするのはクラスの外部からアクセスできないようにするため。\n\t//staticプロパティにするのはstaticメソッドからアクセスするため。\n\t//instanceの型はそのクラス自体に指定する。\n\tprivate static instance:Teacher;\n\t//constructorにprivateとつけることによってシングルトンパターンを実装できる。\n\t//シングルトンパターンはクラスからインスタンスを一つしか作れなくするデザインパターン。\n\t//constructorにprivateをつけることによってクラスの外部ではnewでインスタンスを作ることができなくなる。\n\tprivate constructor(public name:string, public age:number,private subject){}\n\t//シングルトーンパターンにおいて唯一のインスタンスを作成するメソッドは必ずstaticメソッドにする。\n\t//理由はインスタンスをクラス外部では作れないのでstaticメソッドでないと実行できないから。\n\tstatic getInstance(){\n\t\t//初回のインスタンス作成時はTeacher.instanceつまりprivate static instance:Teacherはindefinedとなる。\n\t\tif(Teacher.instance){\n\t\t\treturn Teacher.instance;\n\t\t}\n\t\tTeacher.instance=new Teacher(\"Quill\",38,\"Math\");\n\t\treturn Teacher.instance;\n\t}\n}\n//const teacher=new Teacher(\"Quill\",38,\"Math\");の代わりに以下のようにインスタンスを作る。\n//以下の２行によって作られるインスタンスを2つとも同じもの。\nconst teacher=Teacher.getInstance();\nconst teacher2=Teacher.getInstance();\nconsole.log(teacher,teacher2);\n"
+  },
+  "interface": {
+    "prefix": "interface",
+    "body": "interface Human{\n\tname:string;\n\tage:number;\n\t//オブジェクトのメソッドの書き方がkey:function(parameter:type){}の時は型推論は以下の型の形になる。\n\tgreeting:(message:string)=>void;\n\t//以下の型注釈はメソッドにのみ適用できる。普通の関数には以下の型注釈は使えない。\n\t//オブジェクトのメソッドの書き方がmethodName(){}の時、型推論では以下の型の形で表示される。\n\t//オブジェクトのメソッドの書き方がアロー関数の時は、型推論では以下の型の形で表示される。\n\tbreathing(message:string):void;\n}"
+  },
+  "methodTypeAnnotation": {
+    "prefix": "methodTypeAnnotation",
+    "body": "const human ={\n\tgreeting(message:string):void{\n\t\tconsole.log(message);\n\t},\n\tbreathing:function(air:string):void{\n\t\tconsole.log(air);\n\t},\n\tfunction:(word:string):void=>{\n\t\tconsole.log(word);\n\t}\n}"
+  },
+  "Implements": {
+    "prefix": "implements",
+    "body": "interface Human {\n\tname: string;\n\tage: number;\n\tgreeting(message: string): void;\n}\n//classが親クラスとしてextendsで継承できるのは一つのクラスだけ。しかしimplementsなら複数のinterfaceを実装できる。\n//implementsで実装したinterfaceにあるプロパティやメソッドさえ実装されていればinterfaceには存在しないプロパティやメソッドが余計に存在していても問題ない。\n//implementsをしているクラスはどんなプロパティやメソッドが存在するのか一目ですぐわかるのがメリット。\n//implementsの引数にはinterfaceかtype aliasを入れないといけない。interfaceやtype aliasの代わりに直接オブジェクトの型を直接書くことはできない。\n//ただしimplementsの引数にtype aliasを入れる場合はtype aliasに格納されている型はオブジェクト型でないといけない。例えばstring型ではエラーになる。\n//implementsでstaticメソッドに影響を与えることはできない。例えば特定の名前の特定の型を持つstaticプロパティを持つような縛りを設けることはできない。\n//implementsでクラスについて設定できるのはあくまでそのクラスが生成するインスタンスの形だけ。\nclass Developer implements Human {\n\tstatic id: number = 0;\n\tconstructor(public name: string,public age: number,public experience: number\n\t) {}\n\tgreeting(message: string) {\n\t\tconsole.log('Hello');\n\t}\n}"
+  },
+  "interfaceによる関数の型定義": {
+    "prefix": "interface Func {\n\t(num1: number, num2: number): number;\n}",
+    "body": "interface addFunc {\n\t(num1: number, num2: number): number;\n}"
+  },
+  "optional methodの定義方法": {
+    "prefix": "optional method",
+    "body": "interface Human{\r\tname:string;\r\tage:number;\r\tgreeting?(message:string):void;\r}"
+  },
+  "typeof演算子による型ガード例": {
+    "prefix": "typeof",
+    "body": "//実引数argumentとしてstring型が渡ってきたら全て大文字にして返す、number型が渡ってきたら何も返さない関数。\nfunction toUpperCase(x: string | number) {\n\t//この場ではx.でメソッドの補完を利用しようとするとtoStringメソッドとvalueOfメソッドというstring型とnumber型が両方持っているメソッドのみ表示される。\n\t//なのでここではstring型にしか使えないメソッドである.toUpperCase()は使えない。toUpperCase()を使用するには以下のようにif文を使用しtype guardを使う。\n\tif (typeof x === 'string') {\n\t\treturn x.toUpperCase();\n\t} else {\n\t\t//ここではnumber型が使えるメソッドがx.で参照できる。\n\t\treturn '';\n\t}\n}\n"
+  },
+  "in演算子による型ガード例": {
+    "prefix": "in",
+    "body": "interface Engineer {\n\tname: string;\n\trole: string;\n}\ninterface Blogger {\n\tname: string;\n\tfollower: number;\n}\ntype NomadWorker = Engineer | Blogger;\nfunction describeProfile(nomadWorker: NomadWorker) {\n\t//この場においてはnomadWorkder.補完で出てくるプロパティはEngineer型とBlogger型の両方が持っているnameプロパティだけだが\n\t//以下のようにif文とin演算子を使用することによってroleプロパティにアクセスすることができる。\n\t//また以下のtype guardによってnomadWorkerの型がEngineerであるということが確定されたのでEngineer型が持つrole以外のプロパティにもアクセスできるようになる。\n\tconsole.log(nomadWorker.name);\n\t//以下のようにkey in objectNameで当該オブジェクトに当該keyが存在するかどうかをboolean値で取得することができる。\n\tif ('role' in nomadWorker) {\n\t\tconsole.log(nomadWorker.role);\n\t}\n\tif ('follower' in nomadWorker) {\n\t\tconsole.log(nomadWorker.follower);\n\t}\n}"
+  },
+  "instanceof演算子による型ガード例": {
+    "prefix": "instanceof",
+    "body": "class Dog {\n\tspeak() {\n\t\tconsole.log('bow-wow');\n\t}\n}\nclass Bird {\n\tspeak() {\n\t\tconsole.log('tweet-tweet');\n\t}\n\tfly() {\n\t\tconsole.log('flutter');\n\t}\n}\ntype Pet = Dog | Bird;\nfunction havePet(pet: Pet) {\n\t//DogクラスにもBirdクラスにもspeakメソッドがあるのでspeakメソッドには普通にアクセスできる。\n\tpet.speak();\n\t//flyメソッドにアクセスするには以下のようにする。\n\tif ('fly' in pet) {\n\t\tpet.fly();\n\t}\n\t//flyメソッドには以下のようにしてもアクセスできる。\n\tif (pet instanceof Bird) {\n\t\tpet.fly();\n\t}\n}\nhavePet(new Bird());\nhavePet(new Dog());\n//instanceof演算子では当該クラスによって生成されたインタンスか否かなのかをboolean値で判定するものなので、\n//当該クラスから生成されたインスタンスでないオブジェクトをそのクラスが持つプロパティやメソッドを持たせたとしても、\n//当該クラスから生成されたインスタンスでない限り、true判定されない。\n//instanceofにクラス名ではなくinterfaceを渡すのはアウト。interfaceはJSにコンパイルされた時には消えてしまうので。\nhavePet({\n\tspeak() {\n\t\tconsole.log('hello.');\n\t},\n\tfly() {\n\t\tconsole.log('not fly.');\n\t},\n});"
+  },
+  "tag付きユニオン": {
+    "prefix": "tagged union,descriminated union,タグ付きユニオン,ユニオン判別,",
+    "body": "class Dog {\n\t//タグ付きユニオン(tagged union,descriminated union,ユニオン判別)に使うためのプロパティ\n\tkind: 'dog' = 'dog';\n\tspeak() {\n\t\tconsole.log('bow-wow');\n\t}\n}\nclass Bird {\n\t//タグ付きユニオン(tagged union,descriminated union,ユニオン判別)に使うためのプロパティ\n\tkind: 'bird' = 'bird';\n\tspeak() {\n\t\tconsole.log('tweet-tweet');\n\t}\n\tfly() {\n\t\tconsole.log('flutter');\n\t}\n}\ntype Pet = Dog | Bird;\nfunction havePet(pet: Pet) {\n\tpet.speak();\n\t//switch文でタグ付きユニオン(tagged union,descriminated union,ユニオン判別)による型ガード\n\tswitch (pet.kind) {\n\t\tcase 'bird':\n\t\t\tpet.fly();\n\t}\n\tif ('fly' in pet) {\n\t\tpet.fly();\n\t}\n\tif (pet instanceof Bird) {\n\t\tpet.fly();\n\t}\n}\nhavePet(new Bird());\nhavePet(new Dog());\n"
+  },
+  "interfaceによるタグ付きユニオンの例": {
+    "prefix": "tagged union,descrimanated union by interface",
+    "body": "//interfaceにおいてもタグ付きユニオン,tagged union,descriminated union,ユニオン判別が使える。\ninterface Engineer {\n\tkind: 'engineer';\n\tname: string;\n\trole: string;\n}\ninterface Blogger {\n\tkind: 'blogger';\n\tname: string;\n\tfollower: number;\n}\ntype EngineerOrBlogger=Engineer|Blogger;\nfunction hoge(person:EngineerOrBlogger){\n\tswitch(person.kind){\n\t\tcase \"engineer\":\n\t\t\tconsole.log(person.role);\n\t\t\tbreak;\n\t\tcase\"blogger\":\n\t\t\tconsole.log(person.follower);\n\t\t\tbreak;\n\t}\n}\n"
+  },
+  "type assertionをgenericsによって行う": {
+    "prefix": "type assertion by generics",
+    "body": "//以下のように型アサーションすることによって変数inputの型がHTMLInputElementであることを確定できて、\n//input要素のvalueプロパティにアクセスできる。\n//ただしこのやり方はReactで書くときはJSXと紛らわしいのでReactで型アサーションを行う時はasを使うべき。\nconst input=<HTMLInputElement>document.getElementById(\"input\");\n\tif(input){\n\t\tinput.value\n}"
+  },
+  "type assertion by as": {
+    "prefix": "type assertion by as",
+    "description": "",
+    "body": [
+      "const input =document.getElementById(\"input\") as HTMLInputElement;",
+      "input.value=\"initial input value\";",
+      "",
+      "class Person{",
+      "    greeting(messsage1:string,message2:string,message3:string){",
+      "",
+      "    }",
+      "}"
+    ]
+  },
+  "type assertion by as oneline": {
+    "prefix": "type assertion by as oneline",
+    "body": "(document.getElementById('input') as HTMLInputElement).value = 'initial value';"
+  },
+  "type assertion by generics oneline": {
+    "prefix": "type assertion by generics oneline",
+    "body": "(<HTMLInputElement>document.getElementById('input')).value ='initial input init';"
+  },
+  "non-null assertion operator !": {
+    "prefix": "non-null assertion operator !",
+    "body": "//以下のinput変数の型はnon-null assertion operatorによりHTMLInputElement|nullではなく、HTMLInputElementになっている。\nconst input =document.getElementById(\"input\")!;"
+  },
+  "index signature": {
+    "prefix": "index signature",
+    "body": "//インデックスシグネチャはオブジェクトの型を柔軟に汎用性を高くするもの。\ninterface Designer{\n\tname:string;\n\t//例えば以下のようにインデックスシグネチャを定義すると、プロパティのvalueの型をstringと定義している以上、\n\t//ageやnameなどの他の明示的に存在するように記述したプロパティのvalueの型はインデックスシグネチャで指定したものと同じにしないといけない。\n\t//なので以下のageプロパティの型も本来ならnumber型にしたいところだがそれは以上の理由により不可能。\n\t//もしインデックスシグネチャのプロパティのkeyの型をstring型に指定してもインデックスシグネチャによって、柔軟に作成できるようになった\n\t//プロパティのkeyには文字列だけでなく何故か数字型も設定できる。\n\t//ただしインデックスシグネチャのプロパティのキーのvalueをnumber型に設定した場合は、\n\t//インデックスシグネチャによって、柔軟に作成できるようになったプロパティのkeyには数値型のみしか書けなくなる。\n\tage:string;\n\t[index:string]:string;\n}\nconst designer:Designer={\n\tname:\"Quill\",\n\trole:\"draw\",\n\tage:\"36\",\n\tbelongs:\"passion\",\n\t1:\"ichi\"\n}\ndesigner.stand=\"neu\"\nconsole.log(designer.name);\nconsole.log(designer.age);\n//インデックスシグネチャを設定したオブジェクトの型に明示的に設定したキーにアクセスできるのは当然ではあるのだけど、\n//インデックスシグネチャを使用した型変数を型として持つオブジェクトの実際に存在しないキーにまでアクセスできてしまうので注意！！\nconsole.log(designer.undefinedPropertyName);"
+  },
+  "overload of function": {
+    "prefix": "overload",
+    "body": "//関数のオーバーロードは引数の型のケースの数に応じて以下のように関数の実装部分({}で囲われる処理部分)を除いた記述を\n//関数の上に書く。\n function toUpperCase(x:string):string;\n function toUpperCase(x:number):number;\nfunction toUpperCase(x: string | number): string | number {\n\tif (typeof x === 'string') {\n\t\treturn x.toUpperCase();\n\t}\n\treturn x;\n}\n//オーバーロードの記述によって以下の二つの変数の型はstring|number型でなくそれぞれ上からstring型とnumber型になっている。\nconst upperHello = toUpperCase('hello');\nconst upperHelloRequiem = toUpperCase(22);\n"
+  },
+  "optional chaining ?": {
+    "prefix": "optional chaining ?",
+    "body": "interface DownloadedData{\n\tid:number;\n\tuser?:{\n\t\tname?:{\n\t\t\tfirst:string;\n\t\t\tlast:string;\n\t\t}\n\t}\n}\nconst downloadedData:DownloadedData={\n\tid:1\n}\n//undefined自体を参照してもそれだけで即エラーにはならないが、そのundefinedが持つプロパティを参照しようとするとエラーになる。\n//console.log(downloadedData.user.name);\n\n//一応以下のようにundefinedが持つプロパティを参照してようとしてもnon-null assertion operator !を使うことによってエディタ上の警告は消せる。\nconsole.log(downloadedData.user!.name);\n//以下のようにif文によるtype guardでもエディタ上の警告を消せる。\nif(downloadedData.user){\n\tconsole.log(downloadedData.user);\n}\n//以下のようにoptional chaining ?でもエラーを回避できる。この場合はdownloadedData.userがundefinedまたはnullなら\n//undefinedを返す。\n//もしdownloadedData.user.name.firstが存在するならその値を返す。\n//undefinedが持つプロパティを参照することによって発生する実行時エラーを回避して\n//undefinedで止めてくれるのがoptional chaining ?。\nconsole.log(downloadedData.user?.name?.first);\n"
+  },
+  "nullish coalescing ??": {
+    "prefix": "nullish coalescing ??",
+    "body": "interface DownloadedData {\n\tid: number;\n\tuser?: {\n\t\tname?: {\n\t\t\tfirst: string;\n\t\t\tlast: string;\n\t\t};\n\t};\n}\nconst downloadedData: DownloadedData = {\n\tid: 1,\n};\n//nullish coalescing ??\n//以下の記述では nullish coalescing??より左がnullまたはundefinedならnullish coalescing??よりも右の\"no-user\"がuserDataに代入される。\nconst userData=downloadedData.user ??  \"no-user\";\n\n//nullish coalescing??と||によるショートサーキットとの違いはnullish coalescing??はundefinedとnullのみfalsy判定するのに対し、\n//||によるショートサーキットではnullとundefinedに加え、boolean値のfalseとnumber型の0とNaNと空文字列\"\"もfalsy判定される。\n//boolean値のfalseやnumber型の0やNaNや空文字列\"\"などが歴とした値で意図して入力された場合、それを未定義のものとしてはじきたくない場合便利。\nconst userDataRequiem=downloadedData.user || \"no-user\";"
+  },
+  "lookup type": {
+    "prefix": "lookup",
+    "body": "//lookup型はオブジェクトの型が持っているメンバーの型\ninterface DownloadedData {\n\tid: number;\n\tuser: {\n\t\tname: {\n\t\t\tfirst: string;\n\t\t\tlast: string;\n\t\t};\n\t};\n}\ntype id=DownloadedData[\"id\"];\ntype idRequiem=DownloadedData[\"id\"|\"user\"];\n//オプショナルプロパティの持つプロパティの型にはlookup型ではアクセスできない。\n//lookup型は以下のように階層化されたオブジェクトのプロパティにもアクセスできる。\ntype idGoBeyond=DownloadedData[\"user\"][\"name\"];"
+  },
+  "overload-function-interface": {
+    "prefix": "overload-function-interface",
+    "body": "//関数のオーバーロードの型はinterfaceで以下のように定義する。\n//interfaceの{}の中に複数、名前の無いメソッドの型のような形で並べる。\ninterface TmpFunc {\n\t(x: string): number;\n\t(x: number): number;\n}\n//関数はinterfaceの全ての型を全部実装しなければならない。\nconst upperHello: TmpFunc = function (x: string | number) {\n\treturn 0;\n};\n"
+  },
+  "overload-function-by-intersectionType-interface": {
+    "prefix": "overload-function-by-intersectionType-interface",
+    "body": "//interfaceによって関数のオーバーロードの型を定義できる。interface FuncAの型を持つ関数は、例えば以下のように実装されなければならない。\n// function funcA(a: number | string, b: string | number): number {return 0;}\ninterface FuncA{\n\t(a:number,b:string):number;\n\t(a:string,b:number):number;\n}\ninterface FuncB{\n\t(a:string):number;\n}\nlet intersectionFunc:FuncA & FuncB;\n//は上記の型を全てオーバーロードしたような形になる。もし書くなら以下のようになる。\n// interface IntersectionFunc{\n//     (a:number,b:string):number;\n//     (a:string,b:number):number;\n//     (a:string):number;\n// }\nintersectionFunc=function(a:number|string,b?:number|string){return 0}\n//以下のようにoptional parameter?を使用せずundefinedを使用した場合はパラメーターbを必ず渡さなければならなくなる。\nlet intersectionFuncRequiem=function(a:number|string,b:number|string|undefined){return 0}\n// オーヴァーロードされた関数の定義はinterfaceの中でも行うことができるしまた関数の型を定義したinterface同士を\n// intersection型(交差型)で掛け合わせることによっても、オーヴァーロードされた関数の定義を行うことができる。"
+  },
+  "restParameter": {
+    "prefix": "restParameter",
+    "body": "//レストパラメーターはJSでは以下のように使う。\nfunction advancedFn(...args:any[]){\n\targs[0]\n}\nadvancedFn(0,3,3,3,3);"
+  },
+  "restParameterAndTuple": {
+    "prefix": "restParameterAndTuple",
+    "body": "//以下のように可変長引数rest parameterにタプルで型を指定すると、\n//可変長引数rest parameterの性質のうちの一つである、渡せる引数の数に柔軟性があるという点がなくなり、\n//例えば以下の例では一つ目の引数にnumber型、二つ目の引数にstring型、３つ目の引数にboolean型が入り、\n//４つ以上引数は渡せなくなる。\n//なので可変長引数の型にタプルを指定するということはこの例においては本来3つある引数とその型についての記述を\n//省略して書いている形になる。\nfunction advancedFn(...args:[number,string,boolean]){}\nadvancedFn(0,\"hi\",true);\n"
+  },
+  "restParameterTupleAndOptionalParameter?": {
+    "prefix": "restParameterTupleAndOptionalParameter?",
+    "body": "//以下のように記述することで可変長引数rest parameterの型にタプルを指定することができてかつ\n//オプショナルパラメーターも併用できる。\n//可変長引数rest parameterの型にタプルを指定しかつオプショナルパラメーターを併用するときは\n//タプル内の右側からオプショナルパラメーター?にしなければならない。\n//例えばこの例ではタプルの一番目をオプショナルにしてかつ２番目、3番目を必須にするなどということはできない。\nfunction advancedFn(...args:[number,string,boolean?]){}\nadvancedFn(0,\"hi\",);"
+  },
+  "restParameterTupleAndRestParameterIncideTuple": {
+    "prefix": "restParameterTupleAndRestParameterIncideTuple",
+    "body": "//タプルの中でまた可変長引数の型を定義するには以下のようにする。\n//なお...numbers[]のような型が存在するわけではなく、これはタプルの中でのみ許される記述。\nfunction advancedFn(...args:[number,string,boolean,...number[]]){\n\tconsole.log(args[0]);\n}\nadvancedFn(0,\"hi\",true,3,3,3,3,3,3,3,3,3,3,3,3,3)"
+  },
+  "restParameterTupleRestParameterIncideTupleAndOptionalParameter?": {
+    "prefix": "restParameterTupleRestParameterIncideTupleAndOptionalParameter?",
+    "body": "//タプルの中でまた可変長引数の型を定義するには以下のようにするが、タプル内の可変長引数の前のパラメーターを\n//以下のboolean?のようにオプショナルにすることもできる。ただし、以下のケースではargumentの３番目を\n//しっかりと渡さないと...number[]で定義された箇所は無効になり、４つ目のargument以降はエラーになる。\nfunction advancedFn(...args:[number,string,boolean?,...number[]]){\n\tconsole.log(args[0]);\n}\nadvancedFn(0,\"hi\",true,3,3,3,3,3,3,3,3,3,3,3,3,3);"
+  },
+  "restParametersReadonlyTuple": {
+    "prefix": "restParametersReadonlyTuple",
+    "body": "//可変長引数rest parameterの型のtupleには以下のようにreadonly修飾子をつけることができる。\nfunction advancedFn(...args: readonly [number, string, boolean?, ...number[]]) {\n\t//readonly修飾子によってargs.push()などはできなくなる。\n}\nadvancedFn(0, 'hi', true, 3, 3, 3, 3, 3);"
+  },
+  "restParametersReadonlyArray": {
+    "prefix": "restParametersReadonlyArray",
+    "body": "//可変長引数rest parameterの型には以下のようにreadonly修飾子をつけることができる。\nfunction advancedFnRequiem(...args:readonly number[]){\n\t//readonly修飾子によってargs.push()などはできなくなる。\n}\nadvancedFnRequiem(1,2,3);"
+  },
+  "const assertion array": {
+    "prefix": "const assertion array",
+    "body": "const array=[10,20] as const;"
+  },
+  "const assertion object": {
+    "prefix": "const assertion object",
+    "body": "const peter={\n\tname:\"Peter\",\n\tage:38,\n} as const;"
+  },
+  "typeof演算子による変数からの型抽出": {
+    "prefix": "typeof演算子による変数からの型抽出",
+    "body": "//以下のようにtypeof演算子によって変数からその変数が持っている型を抽出できる。\nconst peter={\n\tname:\"Peter\",\n\tage:38\n}as const ;\ntype PeterType=typeof peter;"
+  },
+  "引数の型が複数あり関数の戻り値をasによるtype assertionで型を絞り込み、そこからメソッド・プロパティにアクセスする方法": {
+    "prefix": "genericsを使わずasによるtype assertionでベタ書きで関数の戻り値の型を絞り込む方法",
+    "body": "// 以下のように一応はasによる型アサーションによって関数の戻り値に.number型がアクセスできずかつstring型でアクセスできるtoUpperCase()などにアクセスできる。\nfunction copy(value:string|number){\n\treturn value;\n}\nconsole.log((copy(\"hello\") as string).toUpperCase());\n"
+  },
+  "オブジェクトを関数の引数に渡してその関数の戻り値からそのオブジェクトの持つプロパティにアクセスする方法": {
+    "prefix": "オブジェクトを関数の引数に渡してその関数の戻り値からそのオブジェクトの持つプロパティにアクセスする方法",
+    "body": "// オブジェクトを関数の引数に渡してその関数の戻り値からそのオブジェクトの持つプロパティにアクセスしたい時は以下のようにすることによって一応は実現可能。\nfunction copy(value:any){\n\treturn value;\n}\nconsole.log((copy({name:\"Quill\"}) as {name:string} ));"
+  },
+  "generics-multiple": {
+    "prefix": "generics-multiple",
+    "body": "function copy<T,U,V>(value:T):T{\n\treturn value;\n}\nconsole.log(copy<string,number,boolean>(\"hello\"));"
+  },
+  "ジェネリクスを用い、実行した関数の戻り値からオブジェクトの持つプロパティへアクセスする方法": {
+    "prefix": "generics-object",
+    "body": "// 以下のようにジェネリクスを使うことによって、実行した関数の戻り値からオブジェクトの持つプロパティへアクセスできる。\nfunction copy<T>(value:T):T{\n\treturn value;\n}\nconsole.log(copy<{name:string}>({name:\"Quill\"}).name);"
+  },
+  "関数の引数にジェネリクスを使用し、かつ型推論を使う": {
+    "prefix": "generics-type-inference",
+    "body": "// // 以下のようにジェネリクスでは関数の実行側でジェネリクスの実引数argumentを渡さなくても、\n// // 型推論してくれる。\nfunction copy<T>(value:T):T{\n\tlet user:T;\n\treturn value;\n}\nconsole.log(copy({name:\"Quill\"}));"
+  },
+  "genericsExtends": {
+    "prefix": "genericsExtends",
+    "body": "//以下のように記述することによって関数実行側で型の実引数を明示的に記述せずに型推論させるケースかつ\n//関数そのものの型パラメーターに制限を設けることができる。\n//これによって例えばcopy関数実行時に引数として{age:\"Quill\"}とかを渡すと\n//エラーが出るようになる。\nfunction copy<T extends {name:string}>(value:T):T{\n\t//以下のようにnameプロパティにもアクセスできる。\n\tconsole.log(value.name);\n\treturn value;\n}\nconsole.log(copy({name:\"Quill\"}));"
+  },
+  "keyof演算子でオブジェクトの型からオブジェクトのキーを取り出す方法": {
+    "prefix": "keyofGenerics",
+    "body": "//keyof演算子はkeyof演算子の右側にある型レベルのオブジェクトの型からkeyを取り出しそのkeyをunion型で型のコンテクストで\n//取り出す。なので以下のKの型はname|age。\ntype K=keyof {name:string;age:number }"
+  },
+  "genericsとextendsとkeyof演算子で、実引数として渡したオブジェクトのプロパティのvalueを参照する方法": {
+    "prefix": "keyofGenericsExtendsObject",
+    "body": "// keyof演算子でオブジェクトの型からそのオブジェクトのキーを抽出し、関数の引数のジェネリクスで使う方法。\nfunction copy<T extends {name:string} ,U extends keyof T>(value:T,key:U):T{\n\tconsole.log(value[key]);\n\treturn value;\n}\nconsole.log(copy({name:\"Quill\",age:38},\"name\"));\n"
+  },
+  "型引数のパラメーターにextendsで制限を加えることによって、関数実行側で実引数を渡さずに型推論をジェネリクスで安全に使用する方法。": {
+    "prefix": "型引数のパラメーターにextendsで制限を加えることによって、関数実行側で実引数を渡さずに型推論をジェネリクスで安全に使用する方法。",
+    "body": "function copy<T extends {name:string}>(value:T):T{\n\treturn value;\n}\nconsole.log(copy({name:\"Quill\"}));"
+  },
+  "genericsClass": {
+    "prefix": "genericsClass",
+    "body": "class LightDatabase<T extends string|number|boolean>{\n\tprivate data:T[]=[];\n\tadd(item:T){\n\t\tthis.data.push(item);\n\t}\n\tremove(item:T){\n\t\tthis.data.splice(this.data.indexOf(item),1)\n\t}\n\tremoveRequiem(item:T){\n\t\tthis.data=this.data.filter((eachData)=>{\n\t\t\treturn item!==eachData;\n\t\t})\n\t}\n\tget(){\n\t\treturn this.data;\n\t}\n}\nconst stringLightDatabase=new LightDatabase<string>();\nstringLightDatabase.add(\"Apple\");\nstringLightDatabase.add(\"Banana\");\nstringLightDatabase.remove(\"Banana\");\nstringLightDatabase.add(\"Strawberry\");\nstringLightDatabase.removeRequiem(\"Strawberry\");\nconsole.log(stringLightDatabase.get());\n\n//上の記述のように一度あるインスタンスを作成したら、genericsを使用した時は最初に入れた引数と同じ型の引数しか入力できなくなり、\n//(この場合では一度string型の引数でインスタンスを作るとそのインスタンスに関するメソッドの引数にはstring型しか\n//入力できなくなる)安全性を確保できるが上の記述をgenericsではなく、通常の共用体型で書くと\n//最初にstring型を引数に入れて作成したインスタンスについても後にnumber型やboolean型の値を入力できてしまい、安全性に欠ける。\nclass LightDatabaseAct2 {\n\tprivate data: (string|number|boolean)[] = [];\n\tadd(item: string|number|boolean) {\n\t\tthis.data.push(item);\n\t}\n\tremove(item: string|number|boolean) {\n\t\tthis.data.splice(this.data.indexOf(item), 1);\n\t}\n\tremoveRequiem(item: string|number|boolean) {\n\t\tthis.data = this.data.filter((eachData) => {\n\t\t\treturn item !== eachData;\n\t\t});\n\t}\n\tget() {\n\t\treturn this.data;\n\t}\n}\nconst stringLightDatabaseAct2 = new LightDatabaseAct2();\nstringLightDatabaseAct2.add(3);\nstringLightDatabaseAct2.add(false);\nstringLightDatabaseAct2.add('Dio');\nstringLightDatabaseAct2.remove('Dio');\nstringLightDatabaseAct2.add('Strawberry');\nstringLightDatabaseAct2.removeRequiem('Strawberry');\nconsole.log(stringLightDatabaseAct2.get());\n"
+  },
+  "genericsInterface": {
+    "prefix": "genericsInterface",
+    "body": "//interfaceでgenericsを使う方法。\ninterface TmpDatabase<T>{\n\tid:number;\n\tdata:T[];\n}\nconst tmpDatabase:TmpDatabase<number>={\n\tid:3,\n\tdata:[32]\n}"
+  },
+  "genericsTypeAlias": {
+    "prefix": "genericsTypeAlias",
+    "body": "//type aliasでgenericsを使う方法。\ntype TmpDatabase<T>={\n\tid:number;\n\tdata:T[];\n}\nconst tmpDatabase:TmpDatabase<number>={\n\tid:3,\n\tdata:[32];\n}"
+  },
+  "utilityType": {
+    "prefix": "utilityType",
+    "body": "//utility型(内蔵されているgeneric型)の例\ninterface Todo{\n\ttitle:string;\n\ttext:string;\n}\ntype Todoable=Partial<Todo>\ntype ReadTodo=Readonly<Todo>"
+  },
+  "genericsPromise": {
+    "prefix": "genericsPromise",
+    "body": "const fetchData: Promise<string> = new Promise((resolve) => {\n\tsetTimeout(() => {\n\t\tresolve('hello');\n\t}, 3000);\n});\nfetchData.then(data=>{\n\t\tdata.toUpperCase();\n})"
+  },
+  "genericsArray": {
+    "prefix": "genericsArray",
+    "body": "//以下の書き方は全く同じ意味\nconst vegetablesAct2:Array<string>=[\"Tomato\",\"Broccoli\",\"Asparagus\"];\nconst vegetables:string[]=[\"Tomato\",\"Broccoli\",\"Asparagus\"];"
+  },
+  "genericsDefaultTypeParameter": {
+    "prefix": "genericsDefaultTypeParameter",
+    "body": "interface ResponseData<T=any>{\n\tdata:T;\n\tstatus:number;\n}\nlet tmpAct2:ResponseData;"
+  },
+  "genericsDefaultTypeParameterExtends": {
+    "prefix": "genericsDefaultTypeParameterExtends",
+    "body": "interface ResponseData<T extends {message:string} =any>{\n\tdata:T;\n\tstatus:number;\n}\nlet tmpAct2:ResponseData;"
+  },
+  "MappedTypes": {
+    "prefix": "MappedTypes",
+    "body": "//型のfor文であるMappedTypes\ntype MappedTypes={\n[P in \"tomato\"|\"pumpkin\"]:P;\n}\n//と書くのは以下のように書くのと同じ。\n// type MappedTypes={\n// tomato:\"tomato\";\n// pumpkin:\"pumpkin\";\n// }"
+  },
+  "MappedTypes2": {
+    "prefix": "MappedTypes2",
+    "body": "type MappedTypesAct2={\n[P in \"tomato\"|\"pumpkin\"]:string;\n}\n//と書くのは以下のように書くのと同じ。\n// type MappedTypesAct2={\n// tomato:string;\n// pumpkin:string;\n// }"
+  },
+  "MappedTypes3": {
+    "prefix": "MappedTypes3",
+    "body": "interface Vegetables{\ntomato:string;\npumpkin:string;\n}\ntype MappedTypesAct4={\n[P in keyof Vegetables]:boolean;\n}\n//と書くのは以下のように書くのと同じ。\n// type MappedTypesAct4={\n// tomato:boolean;\n// pumpkin:boolean;\n// }"
+  },
+  "MappedTypesReadonly": {
+    "prefix": "MappedTypesReadonly",
+    "body": "//以下のようにMappedTypesにreadonly修飾子をつけることができる。\ninterface Vegetables {\ntomato: number;\npumpkin: string;\n}\ntype MappedTypesAct5={\nreadonly [P in keyof Vegetables]:string;\n}"
+  },
+  "MappedTypesOptional?": {
+    "prefix": "MappedTypesOptional?",
+    "body": "// 以下のようにMappedTypesに?をつけてオプショナルパラメーターとすることができる。\ninterface Vegetables {\ntomato: number;\npumpkin: string;\n}\ntype MappedTypesAct6={\nreadonly [P in keyof Vegetables]?:string;\n}"
+  },
+  "MappedTypesReadonly-": {
+    "prefix": "MappedTypesReadonly-",
+    "body": "//以下のようにMappedTypesにつけたreadonlyに-をつけることによってreadonlyを取り消すことができる。\ninterface VegetablesRequiem{\nreadonly tomato:boolean;\npumpkin:boolean;\n}\ntype MappedTypesAct7={\n-readonly [P in keyof VegetablesRequiem]:string;\n}"
+  },
+  "MappedTypesOptional?-": {
+    "prefix": "MappedTypesOptional?-",
+    "body": "//以下のようにMappedTypesにつけた?に-をつけることによってオプショナルパラメーター?を取り消すことができる。\ninterface VegetablesGoBeyond{\nreadonly tomato:boolean;\npumpkin?:boolean;\n}\ntype MappedTypesAct8={\n-readonly [P in keyof VegetablesGoBeyond]-?:string;\n}"
+  },
+  "ConditionalTypes": {
+    "prefix": "ConditionalTypes",
+    "body": "//\"tomato\"型がstring型に代入できるのであればnumber型、できないのであればboolean型という意味。\n//この場合代入できるのでstring型となる。\n//変数代入時と左辺右辺が逆になると考えた方がいい。\ntype ConditionalTypes=\"tomato\" extends string ? number : boolean;\n"
+  },
+  "ConditionalTypes2": {
+    "prefix": "ConditionalTypes2",
+    "body": "//string型が\"tomato\"型に代入できるのであればnumber型、できないのであればboolean型という意味。\n//この場合代入できないのでboolean型になる。\n//変数代入時と左辺右辺が逆になると考えた方がいい。\ntype ConditionalTypesAct2=string extends \"tomato\" ?number:boolean;\n"
+  },
+  "ConditionalTypesInfer": {
+    "prefix": "ConditionalTypesInfer",
+    "body": "type ConditionalTypesInfer={tomato:\"tomato\"} extends {tomato:infer R}?R:any;"
+  },
+  "ConditionalTypesInfer2": {
+    "prefix": "ConditionalTypesInfer2",
+    "body": "type ConditionalTypesInferRequiem={tomato:string} extends {tomato:infer R}?R:any;"
+  },
+  "DistributiveConditionalTypes": {
+    "prefix": "DistributiveConditionalTypes",
+    "body": "//以下のように書くと\"tomato\"と\"pumpkin\"のunion型が\"tomato\"型に代入できるか否かになるので、\n//勿論それはできなくて、この場合はboolean型になる。\ntype DistributiveConditionalTypes=(\"tomato\"|\"pumpkin\") extends \"tomato\"?number:boolean;\n//一方以下のようにgenericsをはさむとnumberとbooleanのunion型になる。\ntype DistributiveConditionalTypesRequiem<T>=T extends \"tomato\"?number:boolean;\nlet tmp4:DistributiveConditionalTypesRequiem<\"tomato\"|\"pumpkin\">;\n//何故かというと直接書いた場合と違いgenericsを挟んだ場合は、\n//\"tomato\" extends \"tomato\" ? number : boolean;\n//と\n//\"pumpkin\" extends \"tomato\" ? number : boolean;\n//の共用体になるから。"
+  },
+  "DistributiveConditionalTypesNonNullable": {
+    "prefix": "DistributiveConditionalTypesNonNullable",
+    "body": "// DistoributiveConditionalTypesの例\ntype NonNullable<T>=T extends null | undefined?never:T;\nlet tmp5:NonNullable<string|null>;\n//上記の記述では\n//string extends null|undefined?never:T;\n//と\n//null extends null|undefined?never:T;\n//のunion型になる。\n//never型は全ての型が内包するボトムタイプなので例えばnever型とstring型の共用体型はstring型になる。\n"
+  },
+  "ConditionalTypesInferUtilityTypeReturnType": {
+    "prefix": "ConditionalTypesInferUtilityTypeReturnType",
+    "body": "//ConditionalTypesとinferを使って関数の返り値の型を抽出するutility型。\ntype ReturnType<T extends (...args: any) => any> = T extends (...args: any) => infer R? R: any;"
+  },
+  "Decorator": {
+    "prefix": "Decorator",
+    "body": "//デコレーターはクラス全体に使うこともできるし、クラス内部の特定のメソッドなどに使用することもできる。\n//デコレーターをクラス全体に使うか、クラス内部の特定のメソッドなどに使用するかによってこの場合でいう@Loggingをどこに入れるかが異なってくる。\n//デコレーターをクラス全体に使うか、クラス内部の特定のメソッドなどに使用するかによってこの場合でいう@Loggingをどこに入れるかが異なってきて、それによってまた@Loggingに必要なargumentも異なってくる。\n//デコレーターをクラス全体に使うか、クラス内部の特定のメソッドなどに使用するかによってこの場合でいう@Loggingをどこに入れるかが異なってきて、それによってまた@Loggingに必要なargumentも異なってくる。そしてクラス全体に使用する場合はargumentは一つになる。\n\n//Loggingのパラメーターの型にはclassと入れたいところだけど、それはできなくて、\n//classはそもそも関数なので(かつてのコンストラクタ関数)ここにはFunction型を注釈する。\n//ただこのFunction型という型はJSにコンパイルされると型ではなくそのまま関数となる。\n//デコレーターはnewでインスタンス生成してなくても実行される。むしろインスタンス生成されるタイミングで実行されるわけではない。\n//デコレーターはインスタンスの生成時ではなくclassの定義時に実行される。\n//デコレーターの関数名は慣習で大文字から始める。\nfunction Logging(constructor:Function){\n\tconsole.log(\"Logging...\");\n\tconsole.log(constructor);\n}\n\n@Logging\nclass User{\n\tname=\"Quill\";\n\tconstructor(){\n\t\tconsole.log(\"User was created!\");\n\t}\n}\nconst user1=new User();\nconst user2=new User();\nconst user3=new User();\n"
+  },
+  "DecoratorFactory": {
+    "prefix": "DecoratorFactory",
+    "body": "//デコレーターファクトリー\n//以下のようにデコレーターを返す関数をデコレーターファクトリーと言う。\nfunction Logging(message: string) {\n\treturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\n//デコレーターファクトリーを使う場合は以下のように@Loggingに()を足して実行してあげる。\n//デコレーターファクトリーを使用することによってデコレーターに引数を渡せるようになったので、以下のように\n//@Loggingに足した()内にLogging Userを記述できる。\n@Logging('Logging User')\nclass User {\n\tname = 'Quill';\n\tconstructor() {\n\t\tconsole.log('User was creatd!');\n\t}\n}"
+  },
+  "DecoratorFactory2": {
+    "prefix": "DecoratorFactory2",
+    "body": "function Logging(message: string) {\n\treturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\t// return function (constructor: Function)\n\t// return function (constructor:{new():object})\n\t// return function (constructor:{new():{name:string}})\n\t// return function (constructor:{new(age:number):{name:string}})\n\t// 以下のようにしてデコレーターを使用するクラスのインスタンス生成時に渡す引数を記述する。\n\t// 以下のようにしてデコレーターを使用するクラスのインスタンス生成時に渡す引数を動的に(複数のクラスに対してデコレーターを使い回す場合は引数の数がわからないので。)記述する。\n\treturn function (constructor: { new (...args: any[]): { name: string } }) {\n\t\tconst mountedElement = document.querySelector(selector);\n\t\t//ここからUserクラスのnameプロパティにアクセスするには、まずUserクラスのnameプロパティはstaticプロパティではないので、User.nameでアクセスできない。なのでとりあえずinstanceを作る。しかし以下のように書くとconstructorに下線エラーが出る。\n\t\t//何故下線エラーが出るかというと:Functionと型定義されているだけなのでそれが普通の関数なのかclass(コンストラクタ関数なのか)をTSが判別できていないから。\n\t\t//この下のconstructorの下線エラーを消すにはデコレーターファクトリーが返す関数の引数を(constructor:Function)から(constructor:{new():object})とするととりあえず消える。\n\t\t//なお(constructor:{new():object})ではなく(constructor:{foo():object})などと引数を受け取るとconstructor.fooなどとアクセスできてしまう。\n\t\t//ただし(constructor:{new():object})と書いてもconstructor.newなどとアクセスすることはできない。\n\t\t//newは予約語。なのでオブジェクトのinterfaceでnewという名前のメソッドは使わないようにする。\n\t\t//ただしinstance.nameとはアクセスできない。instance.nameとアクセスできるようにするにはデコレーターが受け取る引数をこの場合は(constructor:{new():{name:string}})とする。\n\t\tconst instance = new constructor(36);\n\t\tif (mountedElement) {\n\t\t\tmountedElement.innerHTML = template;\n\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t}\n\t};\n}\n//以下の@Componentの()内の引数内のnameはUserクラスのnameプロパティ、この場合は\"Quill\"に対応する。\n//第二引数の\"#app\"は第一引数のHTMLテンプレートを第二引数のid appの要素に挿入するという意図。\n@Component('<h1>{{name}}</h1>', '#app')\n@Logging('Logging User')\nclass User {\n\tname = 'Quill';\n\t//以下のようにデコレーターを使用するクラスのconstructorに引数を渡す場合、勿論呼び出し側でも実引数を渡す必要がある。\n\tconstructor(age: number) {\n\t\tconsole.log('User was creatd!');\n\t}\n}"
+  },
+  "DecoratorFactoryReturnClass": {
+    "prefix": "DecoratorFactoryReturnClass",
+    "body": "//デコレーターは受け取ったクラスを違うものに変えることもできる。\nfunction Logging(message: string) {\n\tconsole.log('Logging Factory.');\n\treturn function (constructor: Function) {\n\tconsole.log(message);\n\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\tconsole.log('Component Factory.');\n\t// return function (constructor: { new (...args: any[]): { name: string,age:number } }) {\n\t//以下のgenerics内のextendsにおいてconstructorがnewできるものであることとデコレーターが受け取ったclassがstring型の値を持つnameフィールドを持っていることを保証できる。\n\treturn function <T extends { new (...args: any[]): { name: string } }>(\n\t\tconstructor: T\n\t) {\n\t\t//無名クラス\n\t\t//無名クラスはデコレーターが受け取るクラスに存在するプロパティを持ってないといけない。あるいはデコレーターが受け取るクラスをextendsで継承していなければならない。\n\t\t//かつデコレーターが受け取るクラスに存在するプロパティの型をデコレーターの引数の型に設定しなければならない。\n\t\treturn class extends constructor {\n\t\t\t// constructor(..._:any[]) {\n\t\t\t// super();\n\t\t\t// }\n\t\t\tconstructor(...args: any[]) {\n\t\t\t\tsuper(...args);\n\t\t\t\tconsole.log('Component!');\n\t\t\t\tconst mountedElement = document.querySelector(selector);\n\t\t\t\tconst instance = new constructor(36);\n\t\t\t\tif (mountedElement) {\n\t\t\t\t\tmountedElement.innerHTML = template;\n\t\t\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t};\n}\n@Logging('Logging User')\n@Component('<h1>{{name}}</h1>', '#app')\nclass User {\n\tname = 'Quill';\n\tconstructor(public age: number) {\n\t\tconsole.log('User was creatd!');\n\t}\n}\nconst user1 = new User(32);\nconst user2 = new User(32);\nconst user3 = new User(32);\n"
+  },
+  "PropertyDescriptor": {
+    "prefix": "PropertyDescriptor",
+    "body": "function Logging(message: string) {\n\tconsole.log('Logging Factory.');\n\treturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\tconsole.log('Component Factory.');\n\treturn function <T extends { new (...args: any[]): { name: string } }>(\n\t\tconstructor: T\n\t) {\n\t\treturn class extends constructor {\n\t\t\tconstructor(...args: any[]) {\n\t\t\t\tsuper(...args);\n\t\t\t\tconsole.log('Component!');\n\t\t\t\tconst mountedElement = document.querySelector(selector);\n\t\t\t\tconst instance = new constructor(36);\n\t\t\t\tif (mountedElement) {\n\t\t\t\t\tmountedElement.innerHTML = template;\n\t\t\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t};\n}\n//デコレーターをclassのプロパティに使用するときは第二引数にはプロパティ名をとる。そのプロパティがstaticプロパティだったら第一引数にはクラスそのものが入る。クラス全体に使用するデコレーターの引数と同じ。\n//そのプロパティがstaticプロパティでなければ第一引数にはそのクラスのprototypeが入る。\nfunction PropertyLogging(target: any, propertyKey: string) {\n\tconsole.log('propertyLogging');\n\tconsole.log(target);\n\tconsole.log(propertyKey);\n}\n@Logging('Logging User')\n@Component('<h1>{{name}}</h1>', '#app')\nclass User {\n\t//デコレーターをclass全体に使うときは呼び出し時に受け取る引数は一つだったが、デコレーターをクラスのプロパティに使用するときは引数を２つとる。\n\t@PropertyLogging\n\t// static name2=\"Quill\"\n\tname = 'Quill';\n\tconstructor(public age: number) {\n\t\tconsole.log('User was creatd!');\n\t}\n\tgreeting() {\n\t\tconsole.log('hello');\n\t}\n}\nconst user1 = new User(32);\nconst user2 = new User(32);\nconst user3 = new User(32);\n\nconsole.log(Logging);\n//オブジェクトで表示してくれる。\nconsole.dir(Logging);\nconsole.dir(User);\n"
+  },
+  "prototype __proto__": {
+    "prefix": "prototype __proto__",
+    "body": "//例えばUserクラスが持つprototypeプロパティUser.prototypeの完全コピーがUserクラスから作られるインスタンスが持つuser.__proto__。\n//なのでこの場合\n// User.prototype===user1.__proto__\n//はtrueを返す。\n//プロパティはインスタンスをconsole.dirでオブジェクトとして見たときに、最も上の階層にある。\n//一方、メソッドはこの場合user1.__proto__の中に存在する。\n//理由はメモリの節約のため。プロパティの独自の値は各々のインスタンスによって異なるので使い回しはできないが、\n//メソッドについてはどのインスタンスについても全く同じ内容なので、__proto__プロパティの中に格納し使いまわしてメモリを節約する。\nclass User {\n\tname = 'Quill';\nconstructor(public age: number) {\n\t\tconsole.log('User was creatd!');\n\t}\n\tgreeting() {\n\t\tconsole.log('hello');\n\t}\n}\nconst user1 = new User(32);"
+  },
+  "Object.getOwnPropertyDescriptor()": {
+    "prefix": "Object.getOwnPropertyDescriptor()",
+    "body": "//const user ={name :\"Quill\",age:32};\n//例えばObject.getOwnPropertyDescriptor(user,name);でnameプロパティに関するメタ情報を得ることができる。\n//Object.getOwnPropertyDescriptor()メソッドで取得できる情報は__proto__に存在するわけでもない。\n//Object.getOwnPropertyDescriptor()メソッドで取得できる情報はブラウザ(クローム)が裏側で持っているもの。\n//メソッドデコレーターの第３引数に渡るのがObject.getOwnPropertyDescriptor()メソッドで取得できるPropertyDescriptor。\n//PropertyDescriptorを変更するにはObject.defineProperty();"
+  },
+  "Object.definePropertyValue": {
+    "prefix": "Object.definePropertyValue",
+    "body": "//以下のようにしてオブジェクトの中のメタ情報であるPropertyDescriptorの書き換えができる。\n//userオブジェクトのnameプロパティの値を\"Quill\"から\"Peter\"に書き換える。\nconst userAct2={name:\"Quill\",age:36};\nObject.defineProperty(userAct2, 'name', { value: 'Peter' });"
+  },
+  "Object.definePropertyWritable": {
+    "prefix": "Object.definePropertyWritable",
+    "body": "//以下のようにしてオブジェクトの中のメタ情報であるPropertyDescriptorの書き換えができる。\n//userオブジェクトのnameプロパティの値を書き換え不可にする。\nObject.defineProperty(user,\"name\",{writable:false});\nuser.name=\"Quill\";\n"
+  },
+  "Object.definePropertyEnumerable": {
+    "prefix": "Object.definePropertyEnumerable",
+    "body": "//以下のようにしてオブジェクトの中のメタ情報であるPropertyDescriptorの書き換えができる。\n//userオブジェクトのnameプロパティをfor inで回しても表示しないようにする。\nObject.defineProperty(user, 'name', { enumerable: false });\nfor (const property in user) {\n\tconsole.log(property);\n}"
+  },
+  "Object.definePropertyConfigurable": {
+    "prefix": "Object.definePropertyConfigurable",
+    "body": "//以下のようにしてオブジェクトの中のメタ情報であるPropertyDescriptorの書き換えができる。\n//userオブジェクトの中のnameプロパティをconfigurableプロパティをfalseにすることによって今後PropertyDescriptorの内容を\n//このObject.defineProperty()メソッドからも書き換えできなくなる。\nObject.defineProperty(user,\"name\",{configurable:false});\n//以下のようにconfigurable:trueに再設定することすらできない。\nObject.defineProperty(user,\"name\",{configurable:true});\n//勿論以下のようにenumerable:trueに再設定することは勿論できない。\nObject.defineProperty(user,\"name\",{enumerable:true});"
+  },
+  "Object.definePropertyGetSet": {
+    "prefix": "Object.definePropertyGetSet",
+    "body": "const user={name:\"Quill\",age:38};\n//以下のようにしてgetterを設定できる。\nObject.defineProperty(user,\"name\",{get(){return \"Hello\"}});\n\n//以下のようにしてsetterを設定できる。\nObject.defineProperty(user,\"name\",{set(){}});"
+  },
+  "MethodDescriptor": {
+    "prefix": "MethodDescriptor",
+    "body": "function Logging(message: string) {\n\tconsole.log('Logging Factory.');\n\treturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\tconsole.log('Component Factory.');\n\treturn function <T extends { new (...args: any[]): { name: string } }>(\n\t\tconstructor: T\n\t) {\n\t\treturn class extends constructor {\n\t\t\tconstructor(...args: any[]) {\n\t\t\t\tsuper(...args);\n\t\t\t\tconsole.log('Component!');\n\t\t\t\tconst mountedElement = document.querySelector(selector);\n\t\t\t\tconst instance = new constructor(36);\n\t\t\t\tif (mountedElement) {\n\t\t\t\t\tmountedElement.innerHTML = template;\n\t\t\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t};\n}\n//デコレーターをclassのプロパティに使用するときは第二引数にはプロパティ名をとる。そのプロパティがstaticプロパティだったら第一引数にはクラスそのものが入る。クラス全体に使用するデコレーターの引数と同じ。そのプロパティがstaticプロパティでなければ第一引数にはそのクラスのprototypeが入る。\nfunction PropertyLogging(target: any, propertyKey: string) {\n\tconsole.log('propertyLogging');\n\tconsole.log(target);\n\tconsole.log(propertyKey);\n}\n//第一引数はプロパティデコレーターと同じく、そのメソッドがstaticメソッドであればクラスそのものが入る。クラスデコレーターの引数と同じ。そのメソッドがstaticメソッド出なければ第一引数にはそのクラスのprototypeが入る。\n//第二引数にはメソッド名が入る。\n//第三引数にはPropertyDescriptorが入る。\nfunction MethodLogging(\n\ttarget: any,\n\tmethodKey: string,\n\tdescriptor: PropertyDescriptor\n) {\n\tconsole.log('MethodLogging');\n\tconsole.log(target);\n\tconsole.log(methodKey);\n\tconsole.log(descriptor);\n}\n@Logging('Logging User')\n@Component('<h1>{{name}}</h1>', '#app')\nclass User {\n\t//デコレーターをclass全体に使うときは呼び出し時に受け取る引数は一つだったが、デコレーターをクラスのプロパティに使用するときは引数を２つとる。\n\t@PropertyLogging\n\tname = 'Quill';\n\tconstructor(public age: number) {\n\t\tconsole.log('User was creatd!');\n\t}\n\t//クラスデコレーターは引数を１つ取り、プロパティデコレーターは引数を二つとり、メソッドデコレーターは引数を３つとる。\n\t@MethodLogging\n\tgreeting() {\n\t\tconsole.log('hello');\n\t}\n}\nconst user1 = new User(32);\nconst user2 = new User(32);\nconst user3 = new User(32);\n\nconsole.log(Logging);\nconsole.dir(Logging);\nconsole.dir(User);"
+  },
+  "AccessorDescriptor": {
+    "prefix": "AccessorDescriptor",
+    "body": "function Logging(message: string) {\n\tconsole.log('Logging Factory.');\n\treturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\tconsole.log('Component Factory.');\n\treturn function <T extends { new (...args: any[]): { name: string } }>(\n\t\tconstructor: T\n\t) {\n\t\treturn class extends constructor {\n\t\t\tconstructor(...args: any[]) {\n\t\t\t\tsuper(...args);\n\t\t\t\tconsole.log('Component!');\n\t\t\t\tconst mountedElement = document.querySelector(selector);\n\t\t\t\tconst instance = new constructor(36);\n\t\t\t\tif (mountedElement) {\n\t\t\t\t\tmountedElement.innerHTML = template;\n\t\t\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t};\n}\nfunction MethodLogging(\n\ttarget: any,\n\tmethodKey: string,\n\tdescriptor: PropertyDescriptor\n) {\n\tconsole.log('MethodLogging');\n\tconsole.log(target);\n\tconsole.log(methodKey);\n\tconsole.log(descriptor);\n}\n//アクセッサーデコレーターもメソッドデコレーターと同じく、第一引数にはプロパティデコレータと同じく、そのメソッドがstaticメソッドであればクラスそのものが入る。クラスデコレーターの引数と同じ。そのメソッドがstaticメソッドでなければクラスのprototypeが入る。\n//第二引数にはgetterやsetrerの名前が入る。\n//第三引数にはPropertyDescriptorが入る。\nfunction AccessorLogging(\n\ttarget: any,\n\tpropertyKey: string,\n\tdescriptor: PropertyDescriptor\n) {\n\tconsole.log('AccessorLogging');\n\tconsole.log(target);\n\tconsole.log(propertyKey);\n\tconsole.log(descriptor);\n}\n@Logging('Logging User')\n@Component('<h1>{{name}}</h1>', '#app')\nclass User {\n\tname = 'Quill';\n\tconstructor(private _age: number) {\n\t\tconsole.log('User was creatd!');\n\t}\n\t@MethodLogging\n\tgreeting() {\n\t\tconsole.log('hello');\n\t}\n\t//アクセッサーデコレータはgetterとsetterのそれぞれ両方の上に記述するのではなく、(アクセスするプロパティが同じものについては)getとsetのうち上の方に記述したものの上に書く。\n\t//アクセッサーデコレータとメソッドデコレータの実行される優先順序については、class内で上に書いたものから順に実行される。\n\t//アクセッサーなので、PropertyDescriptorにはvalueとwritableが存在しなくて、代わりにgetとsetが入っている。\n\t@AccessorLogging\n\tget age() {\n\t\treturn this._age;\n\t}\n\tset age(value) {\n\t\tthis._age = value;\n\t}\n}\nconst user1 = new User(32);\n"
+  },
+  "MethodDescriptorAccessorDescriptorReturn": {
+    "prefix": "MethodDescriptorAccessorDescriptorReturn",
+    "body": "function Logging(message: string) {\nconsole.log('Logging Factory.');\nreturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\tconsole.log('Component Factory.');\n\treturn function <T extends { new (...args: any[]): { name: string } }>(\n\t\tconstructor: T\n\t) {\n\t\treturn class extends constructor {\n\t\t\tconstructor(...args: any[]) {\n\t\t\t\tsuper(...args);\n\t\t\t\tconsole.log('Component!');\n\t\t\t\tconst mountedElement = document.querySelector(selector);\n\t\t\t\tconst instance = new constructor(36);\n\t\t\t\tif (mountedElement) {\n\t\t\t\t\tmountedElement.innerHTML = template;\n\t\t\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t};\n}\nfunction MethodLogging(\n\ttarget: any,\n\tmethodKey: string,\n\tdescriptor: PropertyDescriptor\n) {\n\tconsole.log('MethodLogging');\n\tconsole.log(target);\n\tconsole.log(methodKey);\n\tconsole.log(descriptor);\n}\nfunction enumerable(isEnumerable: boolean) {\n\t//noUnusedParameters:trueにすると使ってないパラメーターがあるとエラーになるがその場合、そのパラーメーター名の冒頭に_を書くとそのエラーを消すことができる。\n\treturn function (\n\t\t_target: any,\n\t\t_propertyKey: string,\n\t\t_descriptor: PropertyDescriptor\n\t) {\n\t\t//メソッドデコレーターとアクセッサーデコレーターは、PropertyDescriptorをreturnで返すことができる。そうすることによって、元々のメソッドについて、元のメソッドが持っているPropertyDescriptorを変更できる。\n\t\treturn {\n\t\t\tenumerable: isEnumerable,\n\t\t};\n\t};\n}\nfunction AccessorLogging(\n\ttarget: any,\n\tpropertyKey: string,\n\tdescriptor: PropertyDescriptor\n) {\n\tconsole.log('AccessorLogging');\n\tconsole.log(target);\n\tconsole.log(propertyKey);\n\tconsole.log(descriptor);\n}\n@Logging('Logging User')\n@Component('<h1>{{name}}</h1>', '#app')\nclass User {\n\tname = 'Quill';\n\tconstructor(private _age: number) {\n\t\tconsole.log('User created!');\n\t}\n\t@enumerable(false)\n\t@MethodLogging\n\tgreeting() {\n\t\tconsole.log('hi');\n\t}\n\t@AccessorLogging\n\tget age() {\n\t\treturn this._age;\n\t}\n\tset age(value) {\n\t\tthis._age = value;\n\t}\n}\nconst user1 = new User(32);\n"
+  },
+  "ParameterDescriptor": {
+    "prefix": "ParameterDescriptor",
+    "body": "function Logging(message: string) {\n\tconsole.log('Logging Factory.');\n\treturn function (constructor: Function) {\n\t\tconsole.log(message);\n\t\tconsole.log(constructor);\n\t};\n}\nfunction Component(template: string, selector: string) {\n\tconsole.log('Component Factory.');\n\treturn function <T extends { new (...args: any[]): { name: string } }>(\n\t\tconstructor: T\n\t) {\n\t\treturn class extends constructor {\n\t\t\tconstructor(...args: any[]) {\n\t\t\t\tsuper(...args);\n\t\t\t\tconsole.log('Component!');\n\t\t\t\tconst mountedElement = document.querySelector(selector);\n\t\t\t\tconst instance = new constructor(36);\n\t\t\t\tif (mountedElement) {\n\t\t\t\t\tmountedElement.innerHTML = template;\n\t\t\t\t\tmountedElement.querySelector('h1')!.textContent = instance.name;\n\t\t\t\t}\n\t\t\t}\n\t\t};\n\t};\n}\nfunction MethodLogging(\n\ttarget: any,\n\tmethodKey: string,\n\tdescriptor: PropertyDescriptor\n) {\n\tconsole.log('MethodLogging');\n\tconsole.log(target);\n\tconsole.log(methodKey);\n\tconsole.log(descriptor);\n}\n//デコレーターはパラメーターにつけることもできる(パラメーターデコレーター)。\n//パラメーターデコレーターはそのパラメーターが含まれるメソッドのデコレーターよりも先に実行される。\n//ParameterDecoratorが取る引数については第一引数がstaticメソッドであればclassそのもの、staticメソッドでなければclassのprototype、第二引数はメソッド名、第三引数はそのパラメーターが何番目のパラメーターなのかを表すインデックス。なのでパラメーターデコレーターはメソッドのある特定のパラメーターが何番目のパラメーターなのか取得することができる。\nfunction ParameterLogging(\n\ttarget: any,\n\tpropertyKey: string,\n\tparameterIndex: number\n) {\n\tconsole.log('ParameterLogging');\n\tconsole.log(target);\n\tconsole.log(propertyKey);\n\tconsole.log(parameterIndex);\n}\n@Logging('Logging User')\n@Component('<h1>{{name}}</h1>', '#app')\nclass User {\n\tname = 'Quill';\n\tconstructor(private _age: number) {\n\t\tconsole.log('User created!');\n\t}\n\t@MethodLogging\n\tgreeting(@ParameterLogging message: string) {\n\t\tconsole.log(message);\n\t}\n\tget age() {\n\t\treturn this._age;\n\t}\n\tset age(value) {\n\t\tthis._age = value;\n\t}\n}\nconst user1 = new User(32);\n"
+  },
+  "ESModuleImport": {
+    "prefix": "ESModuleImport",
+    "body": "//ESModuleでのimportの書き方は合計4つある。\n\n//・普通に名前付きexportを{}で受け取る方法。\n// import {Food} from \"./food.js\";\n\n// ・asで別名で受け取る方法。\n// import {Foodsble as FoodListable} from \"./interfaces.js\";\n\n// ・*で全部受け取ってその全部に対してasでエイリアスをつけて、使用する際はエイリアス.import元のファイルでexportされたものでアクセスする。\n// import * as Interfaces from './interfaces.js';\n// export class Foods implements Interfaces.Foodsable {}\n\n//・default exportされたものを受け取る方法。{}を付けずに名前もas無しで自由に受け取れる。\n// import detaramenonamae from \"./interfaces.js\"\n"
+  },
+  "ESModuleExport": {
+    "prefix": "ESModuleExport",
+    "body": "//ESModuleでのexportの書き方は合計2つある。\n\n// ・名前付きexport\nexport class Foods implements Foodsable{}\n\n//・default export\nexport default class Foods implements Foodsable{}"
+  },
+  "declare": {
+    "prefix": "declare",
+    "body": "// npmでサードパーティ製ライブラリを使うときの型定義の方法。\ndeclare module 'lodash' {\n\t//これによって_.からの補完でshuffleが出るようになる。勿論型も出る。\n\texport function shuffle<T>(arr: T[]): T[];\n}"
+  },
+  "declare const": {
+    "prefix": "declare const",
+    "body": "// CDNでサードパーティ製ライブラリを使うときの型定義の方法。\n//例えばlodashの型定義ファイルlodash.d.ts内に記述すると擦れば以下のようになる。\ndeclare const _: {\nshuffle<T>(arr: T[]): T[];\n};"
+  },
+  "namespace": {
+    "prefix": "namespace",
+    "body": "namespace myApp {\n\tconst hello = 'hello in namespace';\n\texport const name = 'Quill';\n}\nconst hello = myApp.name;"
+  },
+  "namespce2": {
+    "prefix": "namespace2",
+    "body": "namespace myApp{\n\tconst hello=\"hello in namespace\";\n\t//namespaceの外で使いたい変数やinterfaceなどは以下のようにexportする。\n\texport const name=\"Quill\";\n\texport interface Nameable{\n\t\tname:string;\n\t\t}\n}\nconst hello=myApp.name;\n//型が以下のように.でまるでオブジェクトのプロパティにアクセスするような感じの場合は多くのケースにおいて名前空間namespaceを使っている。\nlet nameable:myApp.Nameable;"
+  },
+  "typeofThrowNewError": {
+    "prefix": "typeofThrowNewError",
+    "body": "function add(n1:number,n2:number){\n\tif(typeof n1!==\"number\"||typeof n2!== \"number\"){\n\t\tthrow new Error(\"入力値が正しくありません。\");\n\t}\n\tconsole.log(typeof n1);\n\treturn n1+n2;\n}\nconst number1=\"5\";\nconst number2=2.8;\nconst result= add(number1,number2);\nconsole.log(result);"
+  },
+  "forOf": {
+    "prefix": "forOf",
+    "body": "const person={\n\tname:\"yota\",\n\tage:30,\n\thobbies:[\"Sports\",\"Cooking\"]\n};\nfor(const hobby of person.hobbies){\n\t//TSはhobbyをstringと推論する。理由はhobbyが含まれていた配列がstringの配列だから。\n\t///なのでhobby.でstringのプロパティにアクセスできる。\n\tconsole.log(hobby.toUpperCase());\n\t//string型にはmapメソッドが存在しないので、以下の記述はエラーになる。\n\t// console.log(hobby.map());\n}"
+  },
+  "tuple": {
+    "prefix": "tuple",
+    "body": "const person:{\n\tname:string;\n\tage:number;\n\thobbies:string[];\n\t//Tuple型。TSはこれを二つの要素がある配列だと認識する。１つでも３つでもそれ以上でもアウト。\n\t//また1つ目の要素はnumber型、2つ目の要素はstring型であることを認識する。\n\trole:[number,string];\n}={\n\tname:\"yota\",\n\tage:30,\n\thobbies:[\"Sports\",\"Cooking\"],\n\trole:[2,\"author\"],\n};\n//以下のpushは一見エラーを起こすように思えるが実際は許されてしまう。\nperson.role.push(\"admin\");\n//以下の記述はstring型が入るべきところにnumber型を入れているからエラーになる。\n// person.role[1]=10;\n//以下の記述は２つの要素がないのでエラーになる。\n// person.role=[];\n//３つ目の要素を書くとエラーになる。\n// person.role=[0,\"admin\",\"user\"];\n//とにかくTupleについてはpushが許可されてしまう点は要注意。\n//Tuple型を使って配列に幾つの型があるべきか、その値がどんな型を持つかを指定できる。"
+  },
+  "unionTypeof": {
+    "prefix": "unionTypeof",
+    "body": "function combine(input1:number|string,input2:number|string){\n\tlet result;\n\tif(typeof input1===\"number\" &&typeof input2===\"number\"){\n\t\tresult=input1+input2;\n\t}else{\n\t\tresult=input1.toString()+input2.toString();\n\t}\n\treturn result;\n}\nconst combinedAges = combine(30,26);\nconsole.log(combinedAges);\n\nconst combinedNames=combine(\"Max\",\"Anna\");\nconsole.log(combinedNames);"
+  },
+  "typeAlias": {
+    "prefix": "typeAlias",
+    "body": "type Combinedable=number|string;\ntype ConversionDescriptor=\"as-number\"|\"as-text\";\ntype User={name:string;age:number};"
+  },
+  "関数の型注釈(関数を格納する変数や、callback関数につける型)。": {
+    "prefix": "関数の型注釈(関数を格納する変数や、callback関数につける型)。",
+    "body": "//関数の型注釈(関数を格納する変数や、callback関数につける型)。\nlet combineValues:(a:number,b:number)=>number;"
+  },
+  "callbackTypeInference": {
+    "prefix": "callbackTypeInference",
+    "body": "function addAndHandle(n1:number,n2:number,cb:(num:number)=>void){\n\tconst result=n1+n2;\n\tcb(result);\n}\n//第3引数のコールバックの型は自動的にnumber型と推論されている。\n//なぜなら関数の定義の方で指定されているから。\naddAndHandle(10,20,(result)=>{\n\tconsole.log(result);\n\t//関数の定義側でコールバックの戻り値はvoid型となっているが。\n\t// 以下のようにresultを返してもエラーにはならない。\n\t//関数の定義側のコールバックの戻り値がvoidになっているとこの関数はコールバックの戻り値を\n\t//特に利用しないということを意味する。\n\t//なのでコールバックが実際に値を返していようがいまいが特に影響がないということ。\n\t//だからreturn文があってもエラーにはならない。\n\t//しかし一方コールバック関数が引数として何を受け取るかということは重要。\n\t//何故ならその高階関数がコールバックを呼び出すときに、引数を渡さないといけないから。\n\t//以上が関数の引数については厳密にチェックするのに対して、return文があるかどうかについてはそれほど厳密ではない理由。\n\t// return result;\n});"
+  },
+  "unknown": {
+    "prefix": "unknown",
+    "body": "let userInput: unknown;\nlet userName: string;\nuserInput = 5;\nuserInput = 'Max';\n//string型にunknown型を代入するとエラーになる。\n//userInputがstring型であるということが保証されていないから。\n//userInputがany型であればエラーにはならない。\n//any型の場合はTSは型をチェックしないから。\n//以下のように型ガードでuserInputの型をstring型と指定してあげればエラーなくstring型にunknown型を代入できる。\nif (typeof userInput === 'string') {\n\tuserName = userInput;\n}\n//unknown型はany型よりはましな選択肢。何かをするときにチェックをすることを強制されるから。\n//どのような型を使うか確定してない場合は,暫定的にany型かunknown型を使う。\n//でもやはりその際でもany型よりもunknown型を使うようにする。"
+  },
+  "never": {
+    "prefix": "never",
+    "body": "//never型は関数の戻り値としての型として利用することができる。\n//void型は関数が何も返さないという意味の型。never型も同様に何も返さないということを示すもう一つの型。\n\n//以下のようなエラーを発生させる関数を定義することは大規模プロジェクトでは一般的なこと。\n//ソースコードのあらゆる場所でバラバラにスロー文を書くのではなく、このような共通の関数を定義することはよくある。\n//この関数は様々なエラーメッセージ、エラーコードを受け取ってエラーのオブジェクトをスローする。\n//そしてスクリプトの実行を停止する。\n//この関数は戻り値を持たない。なので戻り値はvoid型。\n//この関数は値を返さないというだけではない。むしろ値を返すことは絶対にあり得ない関数。\n//この関数を実行してもundefinedがconsole上には出ない。\n//何故ならエラーがスローされているから。これによってスクリプトがクラッシュする。スクリプトの実行が停止する。\n//とにかくこの関数は絶対に戻り値を返さない。\n//何故ならこの関数はスクリプトをクラッシュさせるか,try catchで囲ってもキャッチブロックにジャンプするから。\n//なのでこの関数の戻り値はvoid型であるだけでなくnever型でもある。\n//もしneverを指定しない場合は、この関数の戻り値の型は型推論でvoid型になる。\n//これはnever型が後のTSのヴァージョンから追加されたため。\n//以下の関数の戻り値の型をvoid型ではなくnever型であることを明示的に注釈することによって,\n//この関数が値を返すことはあり得ないということを明示的に示すことができる。\n//なのでコードの品質の観点では、neverを指定することによってより意図が分かり易いコードになる。\n//つまりエラーを発生させてコードがクラッシュするということを明確に表すことができる。\n//なお無限ループの場合も戻り値はnever型になる。\nfunction generateError(message:string,code:number):void{\n\t//JSではどんな値でもエラーとしてスローすることができる。\n\tthrow {message:message,errorCode:code};\n}\nconst result= generateError(\"エラーが発生しました\",500);\nconsole.log(result);"
+  },
+  "スプレッド演算子を使用した配列の追加方法": {
+    "prefix": "spread operator",
+    "body": "//スプレッド演算子を使用した配列の追加方法。\nconst hobbies = ['Sports', 'Cooking'];\nconst activeHobbies = ['Hiking'];\nactiveHobbies.push(...hobbies);"
+  },
+  "スプレッド演算子を使用した配列の追加方法2": {
+    "prefix": "spread operator2",
+    "body": "//スプレッド演算子を使用した配列の追加方法2\nconst hobbies = ['Sports', 'Cooking'];\nconst activeHobbies = ['Hiking', ...hobbies];"
+  },
+  "rest parameter 残余引数": {
+    "prefix": "rest parameter 残余引数",
+    "body": "//スプレッド演算子はパラメーターを渡すときだけでなく受け取る時にも使える。\n//受け取る時はrest parameterとなる。\n//これによって、渡されたargument群が一つの配列の中に格納される。\n//このadd関数の型推論は(...numbers:number[])=>numberとなる。\nconst add =(...numbers:number[])=>{\n//reduceメソッドの第一引数に入るコールバック関数の第一引数には現在の計算結果が入る。\n//reduceメソッドの第一引数に入るコールバック関数の第二引数には現在の要素が入る。\n//reduceメソッドの第二引数には現在の計算結果の初期値が入る。このケースでは0。\n//この場合reduce()メソッドの合計値は配列の合計値。\nreturn numbers.reduce((curResult,curValue)=>{\nreturn curResult+curValue;\n},0)\n}"
+  },
+  "restParameterTuple": {
+    "prefix": "restParameterTuple",
+    "body": "//rest parameterはtupleとも組み合わせて使うことができる。\n//以下の記述によって３つのargumentしか受け取ることができなくなる。\n//勿論それぞれの引数の記述をrest parameterを使わずに記述することもできるがrest parameterを使った方が\n//記述が短くなったりわかりやすくなったりもする。\nconst add = (...numbers: [number, number, number]) => {\n\treturn numbers.reduce((curResult, curValue) => {\n\t\treturn curResult + curValue;\n\t}, 0);\n};"
+  },
+  "destructuringAssignmentSpread": {
+    "prefix": "destructuringAssignmentSpread",
+    "body": "const hobbies = ['Sports', 'Cooking', 'Fucking', 'Drinking', 'Sleeping'];\n//配列の分割代入においてもスプレッド構文が使える。...remainingElementの...より右の名前が配列名になり\n//その配列から残りの要素にアクセスできる。\nconst [hobby1, hobby2, ...remainingHobbies] = hobbies;\nconsole.log(hobby1, hobby2);\nconsole.log(remainingHobbies[0]);\nconsole.log(remainingHobbies[1]);\nconsole.log(remainingHobbies[2]);\n"
+  }
+}
