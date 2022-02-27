@@ -1,0 +1,22 @@
+{
+  "arroy function": {
+    "prefix": "ar",
+    "body": "($1)=>{}"
+  },
+  "document.getElementById(\"\").classList.add(\"\")": {
+    "prefix": "document.getElementById(\"\").classList.add(\"\")",
+    "body": "document.getElementById(\"$1\").classList.add(\"$2\")"
+  },
+  "document.getElementById(\"\").classList.remove(\"\")": {
+    "prefix": "document.getElementById(\"\").classList.remove(\"\")",
+    "body": "document.getElementById(\"$1\").classList.remove(\"$2\")"
+  },
+  "hamburgerMenu": {
+    "prefix": "hamburgerMenu",
+    "body": "\\$('.js__Header__hamburger').click(function(){\n\t$('.Header__hamburgerLine').toggleClass('active');\n\t$('#g-nav').toggleClass('panelactive');\n});"
+  },
+  "path.resolve(__dirname);": {
+    "prefix": "path.resolve(__dirname);",
+    "body": "//requireはnodejs上で使うimport文。nodejsではモジュールシステムについての記述はcommonJSを使う。\n//下記のrequireでimportしている\"path\"とはコアnodeJSModuleというものでnodeJSが内蔵しているデフォルトであるmodule。\n//なのでどこかでexportしてなくても普通にrequireでimportできる。\nconst path = require('path');\n//nodeでは以下の記述によって絶対パスをいちいち/などを入れて文字列連結することなく、記述できる。\n//そもそもwindowsはパスの区切りが/ではなかったりするので、下記の記述の方が安全。\n//__dirnameはカレントディレクトリの絶対パスを取得するビルトインのグローバル変数。\nconsole.log(path.resolve(__dirname, 'fafa', 'foo'));\n\nconsole.log(__dirname + '/fafa/');\n//と書くのはだいたい同じ意味だが少し危険。"
+  }
+}

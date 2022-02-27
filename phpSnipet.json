@@ -1,0 +1,105 @@
+{
+	"曜日を日本語で":{
+		"prefix":"$week_name",
+		"body":[
+			"\\$week_name=[\"日\",\"月\",\"火\",\"水\",\"木\",\"金\",\"土\"];\nprint(\\$week_name[date(\"w\")]);"
+		]
+	},
+	"ショートコード":{
+		"prefix":"short",
+		"body":[
+			"echo do_shortcode('ここにショートコード');"
+		]
+	},
+	"htmlspecialchars":{
+		"prefix":"htmlspecialchars(",
+		"body":[
+			"htmlspecialchars(\\$_REQUEST[$1],ENT_QUOTES)"
+		]
+	},
+	"getter":{
+		"prefix":"public function get",
+		"body":"public function get(){\n\treturn \\$this->$1 ;\n}"
+	},
+	"setter":{
+		"prefix":"public function set",
+		"body":"public function set($$1){\n\t\\$this->$2 =$$3 ;\n}"
+	},
+	"dbconnect":{
+		"prefix":"try{$db",
+		"body":"try{\n\t\\$db = new PDO('mysql:dbname=$1;host=localhost;port=8889;charset=utf8','root','root');\n}catch(PDOException \\$e){\n\techo \"DB接続エラー:\".\\$e->getMessage();\n}  "
+	},
+	"PHPでsqlでSELECTクエリを発行し、各レコードから任意のカラムを引き出す":{
+		"prefix":"$records=$db",
+		"body":"\\$records=\\$db->query('SELECT * FROM $1');\nwhile(\\$record=\\$records->fetch()){\n\tprint(\\$record['$2'].\"\\n\");\n}"
+	},
+	"button type=\"submit\" ":{
+		"prefix": "<button",
+		"body": "<button type=\"submit\">$1</button>"
+	},
+	"PHPでユーザーが入力した値をsqlに入れる時にエスケープ1":{
+		"prefix":"$statement=$db",
+		"body":"\\$statement=\\$db->prepare('INSERT INTO $1 SET $2=$3?');\n\\$statement->execute(array(\\$_REQUEST[$4]));"
+	},
+	"PHPでユーザーが入力した値をsqlに入れる時にエスケープ2":{
+		"prefix":"$statement=$db->",
+		"body":"\\$statement=\\$db->prepare('INSERT INTO $1 SET $2=$3?');\n\\$statement->bindParam(1,\\$REQUEST[$4]);\n\\$statement->execute();"
+	},
+	"ページネーション":{
+		"prefix":"pagenation",
+		"body":[
+			"if(\\$page>=2): ?>\n\t<a href=\"index.php?page=<?php print(\\$page-1);?>\"><?php print(\\$page-1); ?>ページ目へ</a>\n<?php endif ; ?>\n|<?php\n\\$counts=\\$db->query('SELECT COUNT(*) as cnt FROM $1 ');\n\\$count=\\$counts->fetch();\n\\$max_page= ceil(\\$count['cnt']/$2 1ページあたり表示する件数);\nif(\\$page<\\$max_page): ?>\n<a href=\"index.php?page=<?php print(\\$page+1);?>\"><?php print(\\$page+1); ?>ページ目へ</a>\n<?php\nendif;"
+		]
+	},
+	"WHEREでid指定したレコードを取り出す":{
+		"prefix":"getRecordById",
+		"body":[
+			"if(isset(\\$_REQUEST['id'])&&is_numeric(\\$_REQUEST['id'])){\n\t\\$id=\\$_REQUEST['id'];\n\t\\$$1=\\$db->prepare('SELECT * FROM $2 WHERE id=?');\n\t\\$$3->execute(array($id));\n\t\\$$4=\\$$5->fetch();\n}"
+		]
+	},
+	"<?php ?>":{
+		"prefix":"<?php ?>",
+		"body":"<?php $1?>"
+	},
+	"フォームが送信されたか否か判断する":{
+		"prefix": "if(!empty())",
+		"body":"if(!empty(\\$_POST)){\n\t$1\n}"
+	},
+	"YmdHis":{
+		"prefix": "YmdHis",
+		"body":"YmdHis",
+	},
+	"enctype='multipart/form-data'":{
+		"prefix": "enctype=\"multipart/form-data\"",
+		"body": "enctype=\"multipart/form-data\"",
+	},
+	"<?php if ?>":{
+		"prefix": "<?php if(): ?>",
+		"body":"<?php if($1): ?>\n\t$2\n<?php endif; ?>"
+	},
+	"<?php foreach(): ?>":{
+		"prefix":"<?php foreach(): ?>",
+		"body":"<?php foreach($1 as $2 ): ?>\n\t\n<?php endforeach; ?>"
+	},
+	"sessionデータ破棄":{
+		"prefix":"$_SESSION=array();",
+		"body":"\\$_SESSION=array();\nif(ini_get('session.use_cookies')){\n\t\\$params=session_get_cookie_params();\n\tsetcookie(session_name(),'',time() - 42000,\n\t\\$params['path'],\\$params['domain'],\\$params['secure'],\\$params['httponly']\n);\n}\nsession_destroy();\nsetcookie('email','',time()-3600);\n"
+	},
+	"<?php while(have_posts()):the_post(); ?>\n\t<?php the_title(); ?>\n<?php endwhile; ?>":{
+		"prefix": "<?php while(have_posts()):the_post(); ?>\n\t<?php the_title(); ?>\n<?php endwhile; ?>",
+		"body":"<?php while(have_posts()):the_post(); ?>\n\t<?php the_title(); ?>\n<?php endwhile; ?>"
+	},
+	"the_time(get_option('date_format'));":{
+		"prefix": "the_time(get_option('date_format'));",
+		"body":"the_time(get_option('date_format'));"
+	},
+	"menu":{
+		"prefix":"<?php\n/\\$menu_name=\"global_nav\";\n\\$locations=get_nav_menu_locations();\n$menu=wp_get_nav_menu_object($locations[$menu_name]);\n\n\\$menu_items=wp_get_nav_menu_items(\\$menu->term_id);\n?>\n<div>\n\t<ul class=\"navbar-nav ml-auto\">\n\t\t<?php foreach(\\$menu_items as \\$item): ?>\n\t\t<li>\n<a href=\"<?php echo \\$item->url; ?>\"><?php echo \\$item->title; ?></a>\n\t\t</li>\n\t\t<?php endforeach; ?>\n\t</ul>\n</div>",
+		"body":"<?php\n//メニューIDを取得する\n\n\\$menu_name=\"global_nav\";\n\\$locations=get_nav_menu_locations();\n\\$menu=wp_get_nav_menu_object(\\$locations[\\$menu_name]);\n\n\\$menu_items=wp_get_nav_menu_items(\\$menu->term_id);\n?>\n<div>\n\t<ul>\n\t\t<?php foreach(\\$menu_items as \\$item): ?>\n\t\t<li>\n\t\t\t<a href=\"<?php echo \\$item->url; ?>\"><?php echo \\$item->title; ?></a>\n\t\t</li>\n\t\t<?php endforeach; ?>\n\t</ul>\n</div>"
+	},
+	"カスタム投稿"{
+		"prefix":"add_action('init',function(){\n\tregister_post_type(\"item\",[\n\t\t\"label\"=>\"商品\",\n\t\t\"public\"=>true\nt]);\n});",
+		"body":"add_action('init',function(){\n\tregister_post_type(\"item\",[\n\t\t\"label\"=>\"商品\",\n\t\t\"public\"=>true\nt]);\n});"
+	}
+
+}

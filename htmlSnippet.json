@@ -1,0 +1,45 @@
+{
+  "selectBox": {
+    "prefix": "<select",
+    "body": "<select name=\"$1\">\n\t<option value=\"$2\">$3</option>\n</select>"
+  },
+
+  "ショートコード": {
+    "prefix": "short",
+    "body": ["<?php echo do_shortcode('ここにショートコード') ?>"]
+  },
+  "radioButton": {
+    "prefix": "<input type=\"radio\"",
+    "body": "<input type=\"radio\" name=\"$1\" value=\"$2\">"
+  },
+  "checkBox": {
+    "prefix": "<input type=\"checkbox\"",
+    "body": "<input type=\"checkbox\" name=\"$1[]\" value=\"$2\">"
+  },
+  "table": {
+    "prefix": "<table",
+    "body": "<table>\n\t<thead>\n\t\t<tr>\n\t\t\t<th>$1</th>\n\t\t</tr>\n\t</thead>\n\t<tbody>\n\t\t<tr>\n\t\t\t<td></td>\n\t\t</tr>\n\t</tbody>\n</table>"
+  },
+  "button type=\"submit\" ": {
+    "prefix": "<button",
+    "body": "<button type=\"submit\">$1</button>"
+  },
+  "<input type='file'>": {
+    "prefix": "<form action='' method='' enctype='multipart/form-data' ",
+    "body": [
+      "<form action=\"$1\" method=\"$2\" enctype=\"multipart/form-data\">\n\t<input type=\"file\">\n</form>"
+    ]
+  },
+  "enctype='multipart/form-data'": {
+    "prefix": "enctype=\"multipart/form-data\"",
+    "body": "enctype=\"multipart/form-data\""
+  },
+  "hamburgerMenu": {
+    "prefix": "Header__hamburger",
+    "body": "<button type=\"button\" class=\"Header__hamburger js__Header__hamburger\" aria-controls=\"global-nav\" aria-expanded=\"false\">\n\t<span class=\"Header__hamburgerLine\"></span>\n</button>"
+  },
+  "globalMenu": {
+    "prefix": "globalMenu",
+    "body": "<nav class=\"gNav\" id=\"g-nav\">\n\t<ul class=\"gNavUl\">\n\t\t<li class=\"gNavLi\"><a href=\"#\">トップ</a></li>\n\t\t<li class=\"gNavLi\"><a href=\"#\">コラム</a></li>\n\t</ul>\n</nav>"
+  }
+}

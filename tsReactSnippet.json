@@ -1,0 +1,10 @@
+{
+  "propsに型定義する方法": {
+    "prefix": "propsに型定義する方法",
+    "body": "//propsを型定義する方法\nfunction App() {\n\treturn (\n\t\t<div>\n\t\t\t<Hello message=\"I am Peter.\"></Hello>\n\t\t</div>\n\t);\n}\n\ntype HelloProps = {\n\tmessage: string;\n};\nconst Hello = (props: HelloProps) => {\n\treturn <h1>Hello {props.message}</h1>;\n};"
+  },
+  "useStateGenerics": {
+    "prefix": "useStateGenerics",
+    "body": "//useStateで扱う値にstring型かnull型を当てたい時。\nconst [name,setName]=useState<string|null>(\"Peter\");"
+  }
+}
